@@ -48,3 +48,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     })
   )
 };
+
+
+// I have a mitale to solve for the details button // Stack Trace
