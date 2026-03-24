@@ -2,7 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'age'
-})
+}) // If you dont get error from frnt end remmber mmemer card
 export class AgePipe implements PipeTransform {
 
   transform(value: string): number {
