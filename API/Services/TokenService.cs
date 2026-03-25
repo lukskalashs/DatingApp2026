@@ -9,7 +9,7 @@ namespace API.Services
 {
     public class TokenService(IConfiguration config) : ITokenService
     {
-        public string CreateToke(AppUser user)
+        public string CreateToken(AppUser user)
         {
            var tokenKey = config["TokenKey"];
 
@@ -41,5 +41,7 @@ namespace API.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+      
     }
 }
