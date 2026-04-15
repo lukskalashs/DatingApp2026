@@ -4,6 +4,7 @@
             (dragover)="onDragOver($event)"
             (dragleave)="OnDragLeave($event)"
             (drop)="OnDrop($event)"
+            (click)="fileInput.click()"
             [class.border-purple-600]="isDragging"
             [class.border-4]="isDragging"
             [class.bg-purple-100]="isDragging"
@@ -12,7 +13,12 @@
                 h-full border-dashed rounded-lg cursor-pointer"
         >
             <p class="mb-2 text-lg">Click to upload or drag and drop</p>
-            <input type="file" id="dropzone-file" class="hidden">
+            <input 
+                #fileInput
+                type="file" 
+                id="dropzone-file" 
+                class="hidden"
+                (change)="onFileSelected($event)">
         </label>
     </div>
     @if (imageSource()) {

@@ -24,20 +24,44 @@ export class MemberPhotos implements OnInit {
 
   ngOnInit(): void {
     const memberId = this.route.parent?.snapshot.paramMap.get('id');
+    console.log('Member photos component init. MemberId:', memberId);
     if (memberId) {
       this.memberService.getMemberPhotos(memberId).subscribe({
-        next: photos => this.photos.set(photos)
+        next: photos => {
+          console.log('Photos loaded:', photos);
+          this.photos.set(photos);
+        },
+        error: error => {
+          console.log('Error loading photos:', error);
+        }
       })
     }
   }
   
   onUploadImage(file: File) {
     this.loading.set(true);
+    
     this.memberService.uploadPhoto(file).subscribe({
       next: photo => {
         this.memberService.editMode.set(false);
-        this.loading.set(false);
-        this.photos.update(photos => [...photos, photo])
+        this.photos.update(photos => [...photos, photo]);
+
+        if(!this.memberService.member()?.imageUrl) {
+          this.setMainLocalPhoto(photo);
+        }
+        
+        // Also refresh photos from server to ensure sync
+        // if (memberId) {
+        //   this.memberService.getMemberPhotos(memberId).subscribe({
+        //     next: refreshedPhotos => {
+        //       console.log('Photos refreshed from server:', refreshedPhotos);
+        //       this.photos.set(refreshedPhotos);
+        //     }
+        //   });
+        // }
+        
+        // this.memberService.editMode.set(false);
+        // this.loading.set(false);
       },
       error: error => {
         console.log('Error uploading image: ', error);
@@ -49,13 +73,8 @@ export class MemberPhotos implements OnInit {
   setMainPhoto(photo: Photo){
     this.memberService.setMainPhoto(photo).subscribe({
       next: () => {
-        const currenrUser = this.accountService.currentUser();
-        if(currenrUser) currenrUser.imageUrl = photo.url;
-        this.accountService.setCurrentUser(currenrUser as User);
-        this.memberService.member.update(member => ({
-          ...member,
-          imageUrl: photo.url
-        }) as Member)
+        this.setMainLocalPhoto(photo);
+        
       }
     })
   }
@@ -66,6 +85,17 @@ export class MemberPhotos implements OnInit {
       }
     })
   }
+
+  private setMainLocalPhoto(photo: Photo){
+    const currenrUser = this.accountService.currentUser();
+        if(currenrUser) currenrUser.imageUrl = photo.url;
+        this.accountService.setCurrentUser(currenrUser as User);
+        this.memberService.member.update(member => ({
+          ...member,
+          imageUrl: photo.url
+        }) as Member)
+  }
+
   
 
   
