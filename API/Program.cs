@@ -21,6 +21,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 builder.Services.AddCors();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<LogUserActivity>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 builder.Services.Configure<CloudinarySettings>(builder.Configuration
@@ -69,3 +70,4 @@ catch (Exception ex)
 }
 
 app.Run();
+// https://localhost:5001
