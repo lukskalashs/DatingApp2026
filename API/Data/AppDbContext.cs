@@ -15,6 +15,8 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<AppUser>
     public DbSet<MemberLike> Likes { get; set; }
 
     public DbSet<Message> Messages { get; set; }
+    public DbSet<Group> Groups {get; set;}
+    public DbSet<Connection> connections {get; set;}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

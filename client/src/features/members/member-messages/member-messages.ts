@@ -1,11 +1,20 @@
-import { Component, effect, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import {
+  Component,
+  effect,
+  ElementRef,
+  inject,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
+
 import { MessageService } from '../../../core/services/message-service';
-import { MemberService } from '../../../core/services/member-service';
 import { AccountService } from '../../../core/services/account-service';
-import { Message } from '../../../types/message';
 import { DatePipe } from '@angular/common';
 import { TimeAgoPipe } from '../../../core/time-ago-pipe';
 import { FormsModule } from '@angular/forms';
+import { PresenceService } from '../../../core/services/presence-service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-member-messages',
@@ -13,61 +22,75 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './member-messages.html',
   styleUrl: './member-messages.css',
 })
-export class MemberMessages implements OnInit {
-  @ViewChild('messageEndRef') messageEndRef!: ElementRef
-  private messageService = inject(MessageService);
-  private memberService = inject(MemberService);
-  private accountService = inject(AccountService);
-  protected messages = signal<Message[]>([]);
-  protected messageContent = '';
+export class MemberMessages implements OnInit, OnDestroy {
 
+  @ViewChild('messageEndRef') messageEndRef!: ElementRef;
+
+  private messageService = inject(MessageService);
+  private accountService = inject(AccountService);
+  protected presence = inject(PresenceService);
+  private route = inject(ActivatedRoute);
+
+  protected messageContent = '';
+  protected messageThread = this.messageService.messageThread;
+
+  private otherUserId!: string;
 
   constructor() {
     effect(() => {
-      const currentMessages = this.messages();
-      if (currentMessages.length) {
-        this.scrollToBottom();
+      const currentMessages = this.messageService.messageThread();
+      if (currentMessages.length > 0) this.scrollToBottom();
+    });
+  }
+
+  ngOnInit(): void {
+    this.route.parent?.paramMap.subscribe({
+      next: params => {
+        const otherUserId = params.get('id');
+        if (!otherUserId) throw new Error('Cannot connect to hub');
+
+        const currentUserId = this.accountService.currentUser()?.id;
+        if (!currentUserId) return;
+
+        this.otherUserId = otherUserId;
+
+        this.messageService.createHubConnection(otherUserId);
+
+      
       }
-    })
+    });
   }
 
-ngOnInit(): void {
-    this.loadMessages();
+  ngOnDestroy(): void {
+    this.messageService.stopHubConnection();
   }
 
-  loadMessages() {
-    const memberId = this.memberService.member()?.id;
-    const currentUserId = this.accountService.currentUser()?.id;
-    if (memberId) {
-      this.messageService.getMessageThread(memberId).subscribe({
-        next: messages => this.messages.set(messages.map(message => ({
-          ...message, 
-          currentUserSender: message.senderId === currentUserId
-        }))),
-        
-      })
-    }
-  }
+  // loadMessages(currentUserId: string) {
+  //   this.messageService.getMessageThread(this.otherUserId).subscribe({
+  //     next: messages => {
+  //       this.messageService.messageThread.set(
+  //         messages.map(m => ({
+  //           ...m,
+  //           currentUserSender: m.senderId === currentUserId
+  //         }))
+  //       );
+  //     }
+  //   });
+  // }
+
   sendMessage() {
-    const recipientId = this.memberService.member()?.id;
-    if (!recipientId) return;
-    this.messageService.sendMessage(recipientId, this.messageContent).subscribe({
-      next: message => {
-        this.messages.update(messages => {
-          message.currentUserSender = true;
-          return [...messages, message]
-        });
-        this.messageContent = '';
-      }
-    })
-  }
-   scrollToBottom() {
+  if (!this.otherUserId || !this.messageContent.trim()) return;
+
+  this.messageService.sendMessage(this.otherUserId, this.messageContent)?.then(() => {
+    this.messageContent = '';
+  });
+}
+
+  scrollToBottom() {
     setTimeout(() => {
-      if (this.messageEndRef) {
-        this.messageEndRef.nativeElement.scrollIntoView({ behavior: 'smooth' });
-      }
-    })
+      this.messageEndRef?.nativeElement.scrollIntoView({
+        behavior: 'smooth'
+      });
+    });
   }
-
-
 }
