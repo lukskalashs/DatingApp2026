@@ -92,6 +92,10 @@ export class MessageService {
   this.hubConnection.on('NewMessage', (message: Message) => {
   message.currentUserSender = message.senderId === currentUser.id;
   this.messageThread.update(messages => [...messages, message]);
+  if (!message.currentUserSender) {
+    this.toast.info(message.senderDisplayName + ' has sent you a new message',
+      10000, message.senderImageUrl);
+  }
 });
 }
 
