@@ -35,9 +35,12 @@
                     <li>
                         <a routerLink="photos" routerLinkActive="text-primary">Photos</a>
                     </li>
-                    <li>
-                        <a routerLink="messages" routerLinkActive="text-primary">Messages</a>
-                    </li>
+                    @if(!isCurrentUser()){
+                        <li>
+                            <a routerLink="messages" routerLinkActive="text-primary">Messages</a>
+                        </li>
+                    }
+                    
                 </ul>
             </div>
 

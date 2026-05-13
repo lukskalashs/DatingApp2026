@@ -6,6 +6,7 @@ import {
   OnInit,
   OnDestroy,
   ViewChild,
+  model,
 } from '@angular/core';
 
 import { MessageService } from '../../../core/services/message-service';
@@ -31,7 +32,7 @@ export class MemberMessages implements OnInit, OnDestroy {
   protected presence = inject(PresenceService);
   private route = inject(ActivatedRoute);
 
-  protected messageContent = '';
+  protected messageContent = model('');
   protected messageThread = this.messageService.messageThread;
 
   private otherUserId!: string;
@@ -79,10 +80,10 @@ export class MemberMessages implements OnInit, OnDestroy {
   // }
 
   sendMessage() {
-  if (!this.otherUserId || !this.messageContent.trim()) return;
+  if (!this.otherUserId || !this.messageContent().trim()) return;
 
-  this.messageService.sendMessage(this.otherUserId, this.messageContent)?.then(() => {
-    this.messageContent = '';
+  this.messageService.sendMessage(this.otherUserId, this.messageContent())?.then(() => {
+    this.messageContent.set('');
   });
 }
 
