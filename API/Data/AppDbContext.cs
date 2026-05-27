@@ -43,6 +43,9 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<AppUser>
            modelBuilder.Entity<MemberLike>()
             .HasKey(k => new { k.SourceMemberId, k.TargetMemberId });
 
+        modelBuilder.Entity<Photo>()
+            .HasQueryFilter(ph => ph.IsApproved);
+
            modelBuilder.Entity<MemberLike>()
             .HasOne(s => s.SourceMember)
             .WithMany(t => t.LikedMembers)

@@ -35,7 +35,7 @@ namespace API.Controllers
         [HttpGet("{id}/photos")]
         public async Task<ActionResult<IReadOnlyList<Photo>>> GetMemberPhotos(string id)
         {
-            return Ok(await uow.MemberRepository.GetPhotosForMemberAsync(id));
+            return Ok(await uow.MemberRepository.GetPhotosForMemberAsync(id, User.GetMemberId() == id));
         }
         [HttpPut]
         public async Task<ActionResult> UpdateMember(MemberUpdateDto memberUpdateDto)
@@ -81,14 +81,15 @@ namespace API.Controllers
                 Url = results.SecureUrl.AbsoluteUri,
                 publicId = results.PublicId,
                 MemberId = User.GetMemberId()
+                // IsApproved will default to false automatically based on the boolean data type
             };
 
-            if(member.ImageUrl == null)
-            {
-                member.ImageUrl = photo.Url;
-                member.User.ImageUrl = photo.Url;
+            // if(member.ImageUrl == null)
+            // {
+            //     member.ImageUrl = photo.Url;
+            //     member.User.ImageUrl = photo.Url;
 
-            }
+            // }
 
             member.Photos.Add(photo);
 
@@ -111,6 +112,11 @@ namespace API.Controllers
             if (member.ImageUrl == photo?.Url || photo == null)
             {
                 return BadRequest("Cannot set this as main image");
+            }
+
+            if (!photo.IsApproved)
+            {
+                return BadRequest("Cannot set an unapproved photo as your main photo");
             }
 
             member.ImageUrl = photo.Url;

@@ -8,6 +8,8 @@ import { AccountService } from '../../core/services/account-service';
 export class HasRole implements OnInit {
   @Input() appHasRole: string[] = [];
   private accountService = inject(AccountService);
+
+  // goes together with the templateRef and viewContainerRef to determine where to render the template
   private viewContainerRef = inject(ViewContainerRef);
   private templateRef = inject(TemplateRef);
 

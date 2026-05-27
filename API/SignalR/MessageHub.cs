@@ -71,7 +71,7 @@ public class MessageHub(IUnitOfWork uow, IHubContext<PresenceHub> presenceHub) :
         if (await uow.Complete())
         {
            
-            // ✅ Consistent casing with client
+           
             await Clients.Group(groupName).SendAsync("NewMessage", message.ToDto());
 
             var connections = await PresenceTracker.GetConnectionsForUser(recipient.Id);

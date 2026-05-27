@@ -19,7 +19,7 @@ namespace API.Entities
     //Navigation property
 
 
-    [JsonIgnore]
+    // [JsonIgnore]
     public List<Photo> Photos { get; set; } = [] ;
 
     [JsonIgnore]
