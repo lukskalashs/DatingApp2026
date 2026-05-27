@@ -1,5 +1,6 @@
 import { Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { AdminService } from '../../../core/services/admin-service';
+import { ToastSevice } from '../../../core/services/toast-sevice';
 import { User } from '../../../types/user';
 
 @Component({
@@ -12,8 +13,9 @@ import { User } from '../../../types/user';
 export class UserManagement implements OnInit {
   @ViewChild('rolesModal') rolesModal!: ElementRef<HTMLDialogElement>;
   private adminService = inject(AdminService);
+  private toastService = inject(ToastSevice);
   protected users = signal<User[]>([]);
-  protected availableRoles = ['Admin', 'Moderator', 'Member'];
+  protected availableRoles = ['Admin', 'Moderator', 'Member', 'VIP'];
   protected selectedUser: User | null = null;
 
   ngOnInit(): void {
@@ -48,8 +50,12 @@ export class UserManagement implements OnInit {
           return u;
         }));
         this.rolesModal.nativeElement.close();
+        this.toastService.success(`Roles updated for ${this.selectedUser?.email}. User must logout and login to access new role permissions.`, 7000);
       },
-      error: error => console.log('Failed to update roles', error)
+      error: error => {
+        console.log('Failed to update roles', error);
+        this.toastService.error('Failed to update roles', 5000);
+      }
     });
   }
 }

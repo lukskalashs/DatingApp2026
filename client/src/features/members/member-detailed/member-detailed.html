@@ -52,6 +52,15 @@
                  [class.btn-success]="!hasLiked()"
                  class="btn flex-1">{{hasLiked() ? 'Remove Like' : 'Like User'}}</button>
             </div>
+            @if (accountService.currentUser()?.roles?.includes('VIP') && !isCurrentUser()) {
+                <div class="px-2 mb-3">
+                    <button 
+                        (click)="blockMember(member.id)" 
+                        class="btn btn-error w-full text-white">
+                        Block Member
+                    </button>
+                </div>
+            }
         </div>
 
         <!-- RIGHT CARD -->

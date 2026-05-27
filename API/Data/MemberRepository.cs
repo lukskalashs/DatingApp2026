@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Entities;
+using API.Extensions;
 using API.Helpers;
 using API.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -48,6 +49,8 @@ namespace API.Data
             var maxDob = DateOnly.FromDateTime(DateTime.Today).AddYears(-memberParams.MinAge);
 
             query = query.Where(x => x.DateOfBirth >= minDob && x.DateOfBirth <= maxDob);
+
+            query = query.ExcludeBlocked(context, memberParams.CurrentMemberId!);
 
             query = memberParams.OrderBy switch
             {

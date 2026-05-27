@@ -35,6 +35,11 @@ namespace API.Entities
 
     [JsonIgnore]
      [ForeignKey(nameof(Id))]
+
+    
+
+     
+
     public AppUser User { get; set; } = null!;
 
 

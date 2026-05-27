@@ -17,6 +17,8 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<AppUser>
     public DbSet<Message> Messages { get; set; }
     public DbSet<Group> Groups {get; set;}
     public DbSet<Connection> connections {get; set;}
+    public DbSet<BlockMember> Blocks { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -27,8 +29,22 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<AppUser>
             .HasData(
                 new IdentityRole{Id = "member-id", ConcurrencyStamp = "a", Name = "Member", NormalizedName = "MEMBER"},
                 new IdentityRole{Id = "moderator-id", ConcurrencyStamp = "b", Name = "Moderator", NormalizedName = "MODERATOR"},
-                new IdentityRole{Id = "admin-id", ConcurrencyStamp = "c", Name = "Admin", NormalizedName = "ADMIN"}
+                new IdentityRole{Id = "admin-id", ConcurrencyStamp = "c", Name = "Admin", NormalizedName = "ADMIN"},
+                new IdentityRole{Id = "vip-id", ConcurrencyStamp = "d", Name = "VIP", NormalizedName = "VIP"}
             );
+        modelBuilder.Entity<BlockMember>().HasKey(key => new { key.SourceMemberId, key.TargetMemberId });
+
+        modelBuilder.Entity<BlockMember>()
+            .HasOne(x => x.SourceMember)
+            .WithMany(x => x.BlockedMembers)
+            .HasForeignKey(x => x.SourceMemberId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<BlockMember>()
+            .HasOne(x => x.TargetMember)
+            .WithMany(x => x.BlockedByMembers)
+            .HasForeignKey(x => x.TargetMemberId)
+            .OnDelete(DeleteBehavior.NoAction); // prevent cascade delete to avoid deleting the source member when the target member is deleted/Avoid crashes
+
 
         modelBuilder.Entity<Message>()
                 .HasOne(x => x.Recipient)

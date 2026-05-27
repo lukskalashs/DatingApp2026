@@ -8,6 +8,10 @@ import { AccountService } from '../../../core/services/account-service';
 import { MemberService } from '../../../core/services/member-service';
 import { PresenceService } from '../../../core/services/presence-service';
 import { LikesService } from '../../../core/services/likes-service';
+import { ToastSevice } from '../../../core/services/toast-sevice';
+import { BlockReasonModal } from '../block-reason-modal/block-reason-modal';
+import { BlockDialogService } from '../../../core/services/block-dialog-service';
+
 
 @Component({
   selector: 'app-member-detailed',
@@ -17,8 +21,9 @@ import { LikesService } from '../../../core/services/likes-service';
 })
 export class MemberDetailed implements OnInit{
   
-  
+  private blockDialogService = inject(BlockDialogService);
   private route = inject(ActivatedRoute);
+  protected toast = inject(ToastSevice);
   protected memberService = inject(MemberService)
   protected accountService = inject(AccountService);
   private router = inject(Router);
@@ -30,6 +35,7 @@ export class MemberDetailed implements OnInit{
     return this.accountService.currentUser()?.id === this.routeId();
   })
   protected presenceService = inject(PresenceService)
+ 
 
    constructor(){
     this.route.paramMap.subscribe(params => {
@@ -49,7 +55,19 @@ export class MemberDetailed implements OnInit{
     })
   }
 
- 
+  async blockMember(targetMemberId: string){
+   const reason = await this.blockDialogService.open('create', '');
+
+    if(reason){
+      this.memberService.blockMember(targetMemberId, reason).subscribe({
+        next: () => {
+          this.toast.success('Member blocked successfully');
+          this.router.navigate(['/members']);
+        }
+      })
+    }
+
+  }
 
 
 

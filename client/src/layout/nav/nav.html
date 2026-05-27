@@ -30,6 +30,11 @@
 
             
                 <a routerLink="/features" routerLinkActive="text-accent">Features</a>
+                @if (accountService.currentUser()?.roles?.includes('VIP')) {
+                <li class="nav-item">
+                    <a class="nav-link" routerLink="/blocks" routerLinkActive="active">Blocked Members</a>
+                </li>
+}
             }
             <a routerLink="/errors" routerLinkActive="text-accent">Errors</a>
 

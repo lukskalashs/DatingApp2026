@@ -67,7 +67,28 @@ export class MemberService {
    deletePhoto(photoId: number) {
     return this.http.delete(this.baseUrl + 'members/delete-photo/' + photoId);
   }
+  blockMember(targetMemberId: string, reason: string) {
+    let url = this.baseUrl + `block/${targetMemberId}`;
 
+    if(reason) {
+      
+        url += "?reason=" + encodeURIComponent(reason);
+      
 
+    }
+
+    return this.http.post(url, {});
+  }
+  getBlockedMembers() {
+    return this.http.get<any[]>(this.baseUrl + 'block');
+  }
+
+  updateBlockReason(targetMemberId: string, reason: string) {
+    return this.http.put(this.baseUrl + 'block/' + targetMemberId, { reason });
+  }
+
+  unblockMember(targetMemberId: string) {
+    return this.http.delete(this.baseUrl + 'block/' + targetMemberId);
+  }
 
 }

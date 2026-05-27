@@ -15,6 +15,9 @@ public class AppUser : IdentityUser
     public DateTime? RefreshTokenExpiry { get; set; }
     public Member Member { get; set; } = null!;
 
+    public ICollection<BlockMember> BlockedMembers { get; set; } = [];
+    public ICollection<BlockMember> BlockedByMembers { get; set; } = [];
+
 
 
 }

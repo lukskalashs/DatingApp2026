@@ -16,6 +16,7 @@ import { memberResolver } from '../features/members/member-resolver';
 import { preventUnsavedChangesGuard } from '../core/guards/prevent-unsaved-changes-guard';
 import { Admin } from '../features/admin/admin';
 import { adminGuard } from '../core/guards/admin-guard';
+import { BlockedMembers } from '../features/members/blocked-members/blocked-members';
 
 export const routes: Routes = [
     {path: '', component: Home},
@@ -45,6 +46,7 @@ export const routes: Routes = [
 
         ]
     },
+    {path: 'blocks', component: BlockedMembers, canActivate: [authGuard] }, // Add VIP guard if you have one
     {path: 'features', component: Features},
     {path: 'errors', component: TestErrors},
     {path: 'server-error', component: ServerError},

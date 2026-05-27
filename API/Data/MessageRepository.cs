@@ -57,6 +57,8 @@ namespace API.Data
                 .OrderByDescending(x => x.MessageSent)
                 .AsQueryable();
 
+            query = query.ExcludeBlocked(context, messageParams.MemberId!);
+
             query = messageParams.Container switch
             {
                 "Outbox" => query.Where(x => x.SenderId == messageParams.MemberId && x.SenderDeleted == false),
@@ -77,6 +79,7 @@ namespace API.Data
                     .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.DateRead, DateTime.UtcNow));
 
             return await context.Messages
+                    .ExcludeBlocked(context, currentMemberId) // Line responsible for excluding messages from blocked users
                     .Where(x => (x.RecipientId == currentMemberId && x.RecipientDeleted == false 
                     && x.SenderId == recipientId)
                         || (x.SenderId == currentMemberId && x.SenderDeleted == false 
