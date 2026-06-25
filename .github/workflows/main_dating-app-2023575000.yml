@@ -98,8 +98,11 @@ jobs:
         with:
           dotnet-version: '10.x' 
 
-      - name: Restore Dependencies
-        run: dotnet restore
+      - name: Build and Publish
+        # This compiles the code and puts it in a temporary folder called "publish-out"
+        run: dotnet publish -c Release -o ./publish-out
 
-      - name: Build, Publish, and Web Deploy
-        run: dotnet publish -c Release /p:PublishMethod=WMSVC /p:MSDeployServiceURL="${{ secrets.WD_SERVER }}" /p:DeployIisAppPath="${{ secrets.WD_SITE }}" /p:Username="${{ secrets.WD_USERNAME }}" /p:Password="${{ secrets.WD_PASSWORD }}" /p:AllowUntrustedCertificate=True /p:SkipExtraFilesOnServer=False
+      - name: Web Deploy to MonsterASP
+        # This forces the GitHub runner to actively upload that folder to your site
+        run: |
+          "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" -verb:sync -source:contentPath="${{ github.workspace }}\publish-out" -dest:contentPath="${{ secrets.WD_SITE }}",ComputerName="${{ secrets.WD_SERVER }}",UserName="${{ secrets.WD_USERNAME }}",Password="${{ secrets.WD_PASSWORD }}",AuthType="Basic" -allowUntrusted
