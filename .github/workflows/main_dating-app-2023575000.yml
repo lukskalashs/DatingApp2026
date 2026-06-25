@@ -77,7 +77,7 @@
 #           slot-name: 'Production'
 #           package: .
           
-name: Build and Deploy .NET API (Web Deploy)
+name: Build and Deploy .NET API (FTP)
 
 on:
   push:
@@ -87,7 +87,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: windows-latest 
+    runs-on: ubuntu-latest 
 
     steps:
       - name: Checkout Source Code
@@ -99,10 +99,13 @@ jobs:
           dotnet-version: '10.x' 
 
       - name: Build and Publish
-        # This compiles the code and puts it in a temporary folder called "publish-out"
         run: dotnet publish -c Release -o ./publish-out
 
-      - name: Web Deploy to MonsterASP
-        shell: cmd
-        run: |
-          "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" -verb:sync -source:contentPath="${{ github.workspace }}\publish-out" -dest:contentPath="${{ secrets.WD_SITE }}",ComputerName="${{ secrets.WD_SERVER }}",UserName="${{ secrets.WD_USERNAME }}",Password="${{ secrets.WD_PASSWORD }}",AuthType="Basic" -allowUntrusted
+      - name: FTP Deploy to MonsterASP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./publish-out/
+          server-dir: /
