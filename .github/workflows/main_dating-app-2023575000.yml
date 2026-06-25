@@ -103,6 +103,6 @@ jobs:
         run: dotnet publish -c Release -o ./publish-out
 
       - name: Web Deploy to MonsterASP
-        # This forces the GitHub runner to actively upload that folder to your site
+        shell: cmd
         run: |
           "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" -verb:sync -source:contentPath="${{ github.workspace }}\publish-out" -dest:contentPath="${{ secrets.WD_SITE }}",ComputerName="${{ secrets.WD_SERVER }}",UserName="${{ secrets.WD_USERNAME }}",Password="${{ secrets.WD_PASSWORD }}",AuthType="Basic" -allowUntrusted
