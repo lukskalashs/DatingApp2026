@@ -1,7 +1,83 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - dating-app-2023575000
+# name: Build and deploy ASP.Net Core app to Azure Web App - dating-app-2023575000
+
+# on:
+#   push:
+#     branches:
+#       - main
+#   workflow_dispatch:
+
+# jobs:
+#   build:
+#     runs-on: windows-latest
+#     permissions:
+#       contents: read #This is required for actions/checkout
+
+#     steps:
+#       - uses: actions/checkout@v4
+
+#       - name: Set up node.js
+#         uses: actions/setup-node@v4
+#         with: 
+#           node-version: '22'
+
+#       - name: Install Angular cli
+#         run: npm install -g @angular/cli@21
+
+#       - name: Install deps and build angular app
+#         run: |
+#           cd client
+#           npm install
+#           ng build 
+
+#       - name: Set up .NET Core
+#         uses: actions/setup-dotnet@v4
+#         with:
+#           dotnet-version: '10.x'
+
+#       - name: Build with dotnet
+#         run: dotnet build --configuration Release
+
+#       - name: dotnet publish
+#         run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+
+#       - name: Upload artifact for deployment job
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: .net-app
+#           path: ${{env.DOTNET_ROOT}}/myapp
+
+#   deploy:
+#     runs-on: windows-latest
+#     needs: build
+#     permissions:
+#       id-token: write #This is required for requesting the JWT
+#       contents: read #This is required for actions/checkout
+
+#     steps:
+#       - name: Download artifact from build job
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: .net-app
+      
+#       - name: Login to Azure
+#         uses: azure/login@v2
+#         with:
+#           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_2D182CB7FF554C2B8CA4805B82B95A74 }}
+#           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B717CFA2B9544DF8B97D6A452461FADB }}
+#           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_6046A06C0FB94B619C4C010D76DB0DE3 }}
+
+#       - name: Deploy to Azure Web App
+#         id: deploy-to-webapp
+#         uses: azure/webapps-deploy@v3
+#         with:
+#           app-name: 'dating-app-2023575000'
+#           slot-name: 'Production'
+#           package: .
+          
+name: Build and Deploy .NET API (Web Deploy)
 
 on:
   push:
@@ -10,70 +86,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: windows-latest
-    permissions:
-      contents: read #This is required for actions/checkout
+  build-and-deploy:
+    runs-on: windows-latest 
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
 
-      - name: Set up node.js
-        uses: actions/setup-node@v4
-        with: 
-          node-version: '22'
-
-      - name: Install Angular cli
-        run: npm install -g @angular/cli@21
-
-      - name: Install deps and build angular app
-        run: |
-          cd client
-          npm install
-          ng build 
-
-      - name: Set up .NET Core
+      - name: Set up .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.x'
+          dotnet-version: '10.x' 
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+      - name: Restore Dependencies
+        run: dotnet restore
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
-
-  deploy:
-    runs-on: windows-latest
-    needs: build
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: .net-app
-      
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_2D182CB7FF554C2B8CA4805B82B95A74 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B717CFA2B9544DF8B97D6A452461FADB }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_6046A06C0FB94B619C4C010D76DB0DE3 }}
-
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'dating-app-2023575000'
-          slot-name: 'Production'
-          package: .
-          
+      - name: Build, Publish, and Web Deploy
+        run: dotnet publish -c Release /p:PublishMethod=WMSVC /p:MSDeployServiceURL="${{ secrets.WD_SERVER }}" /p:DeployIisAppPath="${{ secrets.WD_SITE }}" /p:Username="${{ secrets.WD_USERNAME }}" /p:Password="${{ secrets.WD_PASSWORD }}" /p:AllowUntrustedCertificate=True /p:SkipExtraFilesOnServer=False
