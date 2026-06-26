@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: '/api/',
-  hubUrl: '/hubs/'
+  apiUrl: 'https://dating-app-2026.runasp.net/api/',
+  hubUrl: 'https://dating-app-2026.runasp.net/hubs/'
 };
