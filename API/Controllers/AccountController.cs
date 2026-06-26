@@ -108,7 +108,7 @@ namespace API.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.None,
+                SameSite = SameSiteMode.Strict, // <--- Back to Strict
                 Expires = DateTime.UtcNow.AddDays(7)
             };
 
