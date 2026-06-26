@@ -119,7 +119,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./publish-out/
-          server-dir: /
+          server-dir: /wwwroot/       # <--- THIS IS THE MAGIC FIX
           exclude: |
             **/appsettings.json
             **/appsettings.Development.json
