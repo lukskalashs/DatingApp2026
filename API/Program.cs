@@ -91,7 +91,7 @@ app.UseCors(x => x
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials()
-    .WithOrigins("http://localhost:4200", "https://localhost:4200"));
+    .WithOrigins("http://localhost:4200", "https://localhost:4200", "https://dating-app-frontend-git-main-lukhanyo.vercel.app"));
 
 app.UseAuthentication();
 app.UseAuthorization();
