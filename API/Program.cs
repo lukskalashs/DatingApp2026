@@ -91,7 +91,12 @@ app.UseCors(x => x
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials()
-    .WithOrigins("http://localhost:4200", "https://localhost:4200", "https://dating-app-frontend-git-main-lukhanyo.vercel.app"));
+    .WithOrigins(
+        "http://localhost:4200", 
+        "https://localhost:4200", 
+        "https://dating-app-frontend-git-main-lukhanyo.vercel.app",
+        "https://dating-app-frontend-jade.vercel.app"
+    ));
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -113,9 +118,9 @@ try
     var context = services.GetRequiredService<AppDbContext>();
     var UserManager = services.GetRequiredService<UserManager<AppUser>>();
 
-    await context.Database.MigrateAsync();
-    await context.connections.ExecuteDeleteAsync();
-    await Seed.SeedUsers(UserManager);
+    // await context.Database.MigrateAsync();
+    // await context.connections.ExecuteDeleteAsync();
+    // await Seed.SeedUsers(UserManager);
 }
 catch (Exception ex)
 {
