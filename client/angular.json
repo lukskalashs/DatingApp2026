@@ -46,7 +46,7 @@
           "builder": "@angular/build:application",
           "options": {
             "outputPath": {
-              "base": "../dist",
+              "base": "dist",
               "browser": ""
             },
             "tsConfig": "tsconfig.app.json",
